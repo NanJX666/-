@@ -1,0 +1,147 @@
+@import "tailwindcss";
+
+/* ==========================================================================
+   一、可嵌入核心样式 (Embeddable Core Design Tokens & Scoped Styles)
+   当后续开发者将本项目作为 SillyTavern UI Extension 嵌入宿主页面时，
+   仅需挂载带有 .story-lite-root 类的容器即可获得完整的字体、调色盘与动画，
+   绝不污染宿主全局 body / html / 外层样式。
+   ========================================================================== */
+
+@layer base {
+  :root {
+    --font-novel: "Songti SC", "Source Han Serif SC", "Noto Serif CJK SC", "SimSun", "STSong", "Baskerville", Georgia, serif;
+    --font-ui: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", system-ui, sans-serif;
+  }
+}
+
+.story-lite-root {
+  font-family: var(--font-ui);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+/* 浅色主题 (珍珠白阅读调) */
+.story-lite-root.theme-light {
+  --bg-page: #F5F6F9;
+  --bg-surface: #FFFFFF;
+  --bg-surface-subtle: #F0F2F6;
+  --bg-surface-elevated: #FFFFFF;
+  --text-main: #202736;
+  --text-muted: #6A7382;
+  --text-subtle: #98A2B3;
+  --brand-primary: #625177;
+  --brand-primary-hover: #524364;
+  --brand-primary-soft: #F0ECF4;
+  --border-light: #E4E7EF;
+  --border-subtle: #EEF0F5;
+  --user-bg: #EAE6F0;
+  --user-border: #D8D2E1;
+  --bubble-shadow: 0 2px 10px -2px rgba(32, 39, 54, 0.04);
+  --header-bg: rgba(255, 255, 255, 0.88);
+  --toolbar-bg: rgba(255, 255, 255, 0.92);
+}
+
+/* 深色主题 (墨夜沉寂夜读调) */
+.story-lite-root.theme-dark {
+  --bg-page: #13161C;
+  --bg-surface: #1B202A;
+  --bg-surface-subtle: #222834;
+  --bg-surface-elevated: #232A37;
+  --text-main: #DEE3ED;
+  --text-muted: #8E99AA;
+  --text-subtle: #5F6B7E;
+  --brand-primary: #9C86B8;
+  --brand-primary-hover: #B29CCF;
+  --brand-primary-soft: #2B2338;
+  --border-light: #283040;
+  --border-subtle: #1E2430;
+  --user-bg: #282433;
+  --user-border: #3A3247;
+  --bubble-shadow: 0 2px 12px -2px rgba(0, 0, 0, 0.3);
+  --header-bg: rgba(27, 32, 42, 0.88);
+  --toolbar-bg: rgba(27, 32, 42, 0.94);
+}
+
+/* 作用域小说衬线正文字体 */
+.novel-reading-font {
+  font-family: var(--font-novel);
+}
+
+.ui-font {
+  font-family: var(--font-ui);
+}
+
+/* 作用域微型滚动条 */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(150, 150, 160, 0.22);
+  border-radius: 9999px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(150, 150, 160, 0.45);
+}
+
+/* 移动端触控按压反馈 */
+.touch-action-pill {
+  transition: transform 0.15s cubic-bezier(0.2, 0, 0.2, 1), background-color 0.15s ease, opacity 0.15s ease;
+}
+.touch-action-pill:active {
+  transform: scale(0.96);
+}
+
+/* 轻量动画 */
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.98); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translate3d(-50%, 12px, 0); }
+  to { opacity: 1; transform: translate3d(-50%, 0, 0); }
+}
+
+@keyframes slideRight {
+  from { transform: translate3d(-100%, 0, 0); }
+  to { transform: translate3d(0, 0, 0); }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.18s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-slideUp {
+  animation: slideUp 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-slideRight {
+  animation: slideRight 0.24s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* 尊重减少动画系统偏好 */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ==========================================================================
+   二、独立运行原型全屏外壳样式 (Standalone Prototype Shell Wrapper)
+   此部分仅在独立运行当前 Vite 原型网页（作为完整网站）时生效。
+   当挂载至 SillyTavern 宿主环境时可忽略或由宿主容器提供宽高。
+   ========================================================================== */
+
+#root {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
