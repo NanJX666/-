@@ -1,0 +1,6 @@
+{
+  "name": "未完 - 故事从这里继续",
+  "description": "极简、沉浸、移动端优先的中文 RP 与小说聊天网站原型",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

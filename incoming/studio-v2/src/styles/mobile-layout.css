@@ -1,0 +1,81 @@
+/**
+ * mobile-layout.css - 针对 360px ~ 430px 真实移动端（realme GT5 Pro / 小米14）的外层触控与排版微调
+ * 所有选择器严格限定在 .story-lite-root 作用域内，不污染宿主环境，不创建全局 reset。
+ */
+
+.story-lite-root {
+  /* 统一在移动设备上的文本断行防溢出 */
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
+/* 44px 移动端推荐触控目标最小包裹层 */
+.story-lite-root .touch-target-44 {
+  min-width: 44px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 针对移动端软键盘与底部手势条的安全区适配 */
+.story-lite-root .mobile-bottom-safe {
+  padding-bottom: max(0.75rem, env(safe-area-inset-bottom, 0px));
+}
+
+.story-lite-root .mobile-top-safe {
+  padding-top: max(0.5rem, env(safe-area-inset-top, 0px));
+}
+
+/* 键盘焦点清晰指示器 (符合 WCAG AA 规范) */
+.story-lite-root button:focus-visible,
+.story-lite-root input:focus-visible,
+.story-lite-root textarea:focus-visible,
+.story-lite-root [tabindex]:focus-visible {
+  outline: 2px solid var(--brand-primary);
+  outline-offset: 2px;
+}
+
+/* 确保深色/浅色模式下的错误通知和警告文本高对比度且不依赖未配置的外部 dark 类 */
+.story-lite-root.theme-light .readable-alert-error {
+  background-color: #FEF2F2;
+  border-color: #FECACA;
+  color: #991B1B;
+}
+
+.story-lite-root.theme-dark .readable-alert-error {
+  background-color: #381A22;
+  border-color: #7F1D1D;
+  color: #FCA5A5;
+}
+
+.story-lite-root.theme-light .readable-alert-warning {
+  background-color: #FFFBEB;
+  border-color: #FDE68A;
+  color: #92400E;
+}
+
+.story-lite-root.theme-dark .readable-alert-warning {
+  background-color: #332415;
+  border-color: #78350F;
+  color: #FCD34D;
+}
+
+/* 静止的浮动“回到最新”按钮，避免持续弹跳分散阅读注意力 */
+.story-lite-root .steady-jump-latest {
+  animation: fadeIn 0.15s ease-out forwards;
+}
+
+/* 富内容排版样本表格的移动端平滑横向滚动容器 */
+.story-lite-root .rich-layout-table-container {
+  max-width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+@media (max-width: 390px) {
+  /* 针对 360px 极窄屏顶栏标题的自适应收缩与不换行保障 */
+  .story-lite-root .compact-header-title {
+    max-width: calc(100vw - 160px);
+  }
+}
