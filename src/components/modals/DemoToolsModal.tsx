@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { X, Sliders, RefreshCw, CheckCircle, Info } from 'lucide-react';
+import { X, Sliders, RefreshCw, CheckCircle, Info, Sparkles } from 'lucide-react';
 import { StoryService } from '../../types/story';
 
 interface DemoToolsModalProps {
@@ -7,6 +7,7 @@ interface DemoToolsModalProps {
   onClose: () => void;
   service: StoryService;
   onReloadRequested: () => void;
+  onTriggerSplashPreview?: () => void;
 }
 
 export const DemoToolsModal: React.FC<DemoToolsModalProps> = ({
@@ -14,6 +15,7 @@ export const DemoToolsModal: React.FC<DemoToolsModalProps> = ({
   onClose,
   service,
   onReloadRequested,
+  onTriggerSplashPreview,
 }) => {
   const [simulateError, setSimulateError] = useState(service.getSimulateErrorOnce());
   const [emptyList, setEmptyList] = useState(service.getEmptyListSimulation());
@@ -91,9 +93,32 @@ export const DemoToolsModal: React.FC<DemoToolsModalProps> = ({
           <div className="p-3.5 rounded-2xl bg-[var(--bg-surface-subtle)] border border-[var(--border-light)] text-xs text-[var(--text-muted)] flex gap-2.5">
             <Info className="w-4 h-4 text-[var(--brand-primary)] shrink-0 mt-0.5" />
             <div>
-              本抽屉仅供评审手机交互边界（网络异常保留输入与重试、空列表状态、流式中断恢复）。上线时可无缝移除。
+              本抽屉仅供评审手机交互边界（网络异常保留输入与重试、空列表状态、流式中断恢复、启动加载画面）。上线时可无缝移除。
             </div>
           </div>
+
+          {/* Test Option: Splash Screen Preview */}
+          {onTriggerSplashPreview && (
+            <div className="p-3.5 rounded-2xl border border-[var(--border-light)] flex flex-col gap-2">
+              <div className="font-medium text-xs text-[var(--text-main)] flex items-center gap-1.5">
+                <Sparkles className="w-3.5 h-3.5 text-[var(--brand-primary)]" />
+                <span>启动加载画面 (Splash Screen) 预览</span>
+              </div>
+              <div className="text-[11px] text-[var(--text-muted)] leading-relaxed">
+                可模拟检验“正常加载”、“加载较久（继续等待）”、“加载失败（重试按钮）”三种状态及其退出过渡。
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  onClose();
+                  onTriggerSplashPreview();
+                }}
+                className="mt-1 touch-target-44 min-h-[44px] flex items-center justify-center gap-2 px-4 rounded-full bg-[var(--brand-primary-soft)] text-[var(--brand-primary)] hover:bg-[var(--brand-primary)] hover:text-white active:scale-95 text-xs font-medium transition-all cursor-pointer"
+              >
+                <span>进入启动画面状态预览</span>
+              </button>
+            </div>
+          )}
 
           {/* Test Option 1: Network error simulation */}
           <div className="flex items-start justify-between gap-4 p-3.5 rounded-2xl border border-[var(--border-light)] hover:bg-[var(--bg-surface-subtle)]/50 transition-colors">

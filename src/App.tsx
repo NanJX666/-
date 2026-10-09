@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { ReadingPreferences, Story } from './types/story';
 import { mockStoryService } from './services/mockStoryService';
 import { LandingView } from './components/views/LandingView';
@@ -11,6 +11,7 @@ import { StoryListView } from './components/views/StoryListView';
 import { CreateStoryView } from './components/views/CreateStoryView';
 import { ChatView } from './components/views/ChatView';
 import { DemoToolsModal } from './components/modals/DemoToolsModal';
+import { StartupLoadingScreen, StartupStatus } from './components/common/StartupLoadingScreen';
 import './styles/mobile-layout.css';
 
 type AppView = 'landing' | 'stories' | 'create' | 'chat';
@@ -26,22 +27,68 @@ export default function App() {
   // Global modals
   const [isDemoToolsOpen, setIsDemoToolsOpen] = useState(false);
 
-  // Refresh stories list
-  const refreshStories = useCallback(async () => {
-    const list = await mockStoryService.listStories();
-    setStories(list);
+  // Startup Splash Screen State
+  const [isStartupSplashVisible, setIsStartupSplashVisible] = useState(true);
+  const [isAppReady, setIsAppReady] = useState(false);
+  const [startupStatus, setStartupStatus] = useState<StartupStatus>('loading');
+  const [startupError, setStartupError] = useState<string | undefined>(undefined);
+  const [isPreviewSplashMode, setIsPreviewSplashMode] = useState(false);
+  const slowTimerRef = useRef<number | null>(null);
+
+  // Real App Initialization logic without fake progress
+  const initApp = useCallback(async () => {
+    setStartupStatus('loading');
+    setStartupError(undefined);
+    setIsAppReady(false);
+
+    // If real initialization takes longer than 4.5 seconds, shift to 'slow' state
+    if (slowTimerRef.current !== null) {
+      window.clearTimeout(slowTimerRef.current);
+    }
+    slowTimerRef.current = window.setTimeout(() => {
+      setStartupStatus((current) => (current === 'loading' ? 'slow' : current));
+    }, 4500);
+
+    try {
+      const list = await mockStoryService.listStories();
+      setStories(list);
+      // Real ready signal received: smooth exit triggers
+      setIsAppReady(true);
+    } catch (err: any) {
+      setStartupStatus('failed');
+      setStartupError(err?.message || '读取故事存储服务未就绪，请点击重试。');
+    } finally {
+      if (slowTimerRef.current !== null) {
+        window.clearTimeout(slowTimerRef.current);
+        slowTimerRef.current = null;
+      }
+    }
   }, []);
 
+  // Refresh stories list (during runtime)
+  const refreshStories = useCallback(async () => {
+    try {
+      const list = await mockStoryService.listStories();
+      setStories(list);
+    } catch (e) {
+      console.warn('Refresh stories warning:', e);
+    }
+  }, []);
+
+  // Run real initialization on boot
   useEffect(() => {
-    refreshStories();
+    initApp();
     const unsubscribe = mockStoryService.subscribe(() => {
       refreshStories();
       setPreferences(mockStoryService.getPreferences());
     });
     return () => {
       unsubscribe();
+      if (slowTimerRef.current !== null) {
+        window.clearTimeout(slowTimerRef.current);
+      }
     };
-  }, [refreshStories]);
+  }, [initApp, refreshStories]);
 
   const handleUpdatePreferences = (partial: Partial<ReadingPreferences>) => {
     mockStoryService.updatePreferences(partial);
@@ -58,12 +105,42 @@ export default function App() {
     setCurrentView('chat');
   };
 
+  // Preview splash screen controls (from DemoTools)
+  const handleTriggerSplashPreview = () => {
+    setIsPreviewSplashMode(true);
+    setStartupStatus('loading');
+    setIsAppReady(false);
+    setIsStartupSplashVisible(true);
+  };
+
   const themeClass = preferences.theme === 'dark' ? 'theme-dark' : 'theme-light';
 
   return (
     <div
       className={`story-lite-root ${themeClass} min-h-[100dvh] bg-[var(--bg-page)] text-[var(--text-main)] transition-colors selection:bg-[var(--brand-primary)]/20 selection:text-[var(--text-main)]`}
     >
+      {/* 启动加载画面 (Startup Loading Screen) */}
+      {isStartupSplashVisible && (
+        <StartupLoadingScreen
+          status={startupStatus}
+          errorMessage={startupError}
+          isReady={isAppReady}
+          theme={preferences.theme}
+          onRetry={initApp}
+          onReady={() => {
+            setIsStartupSplashVisible(false);
+            setIsPreviewSplashMode(false);
+          }}
+          enablePreviewSwitcher={isPreviewSplashMode}
+          onPreviewStatusChange={(nextStatus) => {
+            setStartupStatus(nextStatus);
+            if (nextStatus === 'failed') {
+              setStartupError('模拟数据连接超时或扩展未就绪，请点击重试。');
+            }
+          }}
+        />
+      )}
+
       {currentView === 'landing' && (
         <LandingView
           onEnter={() => setCurrentView('stories')}
@@ -114,6 +191,7 @@ export default function App() {
         onClose={() => setIsDemoToolsOpen(false)}
         service={mockStoryService}
         onReloadRequested={refreshStories}
+        onTriggerSplashPreview={handleTriggerSplashPreview}
       />
     </div>
   );

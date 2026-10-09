@@ -1,0 +1,329 @@
+/**
+ * splash.css - “未完” 启动加载画面独立样式
+ * 专用前缀：.ww-splash-
+ * 适用场景：SillyTavern 扩展在 React / 框架脚本下载并初始化之前展示。
+ * 零框架依赖，严格隔离，不污染宿主 body / html / 外部选择器。
+ */
+
+.ww-splash-overlay {
+  --ww-splash-font-novel: "Songti SC", "Source Han Serif SC", "Noto Serif CJK SC", "SimSun", "STSong", "Baskerville", Georgia, serif;
+  --ww-splash-font-ui: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", system-ui, sans-serif;
+  
+  /* 浅色主题 (珍珠白) */
+  --ww-splash-bg-page: #F5F6F9;
+  --ww-splash-bg-surface: #FFFFFF;
+  --ww-splash-bg-subtle: #F0F2F6;
+  --ww-splash-text-main: #202736;
+  --ww-splash-text-muted: #6A7382;
+  --ww-splash-text-subtle: #98A2B3;
+  --ww-splash-brand: #625177;
+  --ww-splash-brand-soft: #F0ECF4;
+  --ww-splash-border: #E0E3EB;
+  --ww-splash-danger-bg: #FEF2F2;
+  --ww-splash-danger-text: #991B1B;
+
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  z-index: 99999;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 1rem;
+  box-sizing: border-box;
+  background-color: var(--ww-splash-bg-page);
+  color: var(--ww-splash-text-main);
+  font-family: var(--ww-splash-font-ui);
+  user-select: none;
+  -webkit-user-select: none;
+  opacity: 1;
+  transition: opacity 0.32s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.32s ease;
+}
+
+/* 深色主题 (墨夜沉寂) */
+.ww-splash-overlay[data-theme="dark"] {
+  --ww-splash-bg-page: #13161C;
+  --ww-splash-bg-surface: #1B202A;
+  --ww-splash-bg-subtle: #222834;
+  --ww-splash-text-main: #DEE3ED;
+  --ww-splash-text-muted: #8E99AA;
+  --ww-splash-text-subtle: #5F6B7E;
+  --ww-splash-brand: #9C86B8;
+  --ww-splash-brand-soft: #2B2338;
+  --ww-splash-border: #283040;
+  --ww-splash-danger-bg: #381A22;
+  --ww-splash-danger-text: #FCA5A5;
+}
+
+/* 平滑淡出退出 */
+.ww-splash-overlay.ww-splash-exiting {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+/* 顶栏与底栏 */
+.ww-splash-header {
+  width: 100%;
+  max-width: 24rem;
+  min-height: 2rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 0.6875rem;
+  letter-spacing: 0.05em;
+  color: var(--ww-splash-text-subtle);
+}
+
+.ww-splash-footer {
+  width: 100%;
+  max-width: 24rem;
+  text-align: center;
+  font-size: 0.625rem;
+  letter-spacing: 0.04em;
+  color: var(--ww-splash-text-subtle);
+  padding-bottom: max(0.5rem, env(safe-area-inset-bottom, 0px));
+}
+
+/* 主体内容容器 (适配 360, 390, 430px 及横屏) */
+.ww-splash-body {
+  width: 100%;
+  max-width: 22rem;
+  margin: auto 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 1rem;
+  box-sizing: border-box;
+}
+
+/* 图标标识 */
+.ww-splash-logo {
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 1.25rem;
+  background-color: var(--ww-splash-brand);
+  color: #FFFFFF;
+  font-family: var(--ww-splash-font-novel);
+  font-weight: 700;
+  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 14px -3px rgba(0, 0, 0, 0.12);
+  margin-bottom: 1.25rem;
+}
+
+/* 品牌文字 */
+.ww-splash-title {
+  margin: 0;
+  font-family: var(--ww-splash-font-novel);
+  font-size: 1.625rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  color: var(--ww-splash-text-main);
+  line-height: 1.2;
+}
+
+.ww-splash-tagline {
+  margin: 0.5rem 0 0 0;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  color: var(--ww-splash-text-muted);
+  font-weight: 400;
+}
+
+/* 动态状态区域 */
+.ww-splash-status-box {
+  width: 100%;
+  margin-top: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 5.5rem;
+  justify-content: center;
+}
+
+/* 1. 正常加载状态 */
+.ww-splash-pulse-track {
+  width: 9rem;
+  height: 0.25rem;
+  border-radius: 9999px;
+  background-color: var(--ww-splash-border);
+  overflow: hidden;
+  position: relative;
+  margin-bottom: 1rem;
+}
+
+.ww-splash-pulse-thumb {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  border-radius: 9999px;
+  background-color: var(--ww-splash-brand);
+  opacity: 0.85;
+  animation: ww-splash-breathe 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.ww-splash-status-text {
+  font-size: 0.75rem;
+  color: var(--ww-splash-text-muted);
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+/* 2. 加载较久状态 (提示仍在加载，可以继续等待) */
+.ww-splash-slow-badge {
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 9999px;
+  background-color: var(--ww-splash-bg-subtle);
+  border: 1px solid var(--ww-splash-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ww-splash-brand);
+  margin-bottom: 0.75rem;
+  animation: ww-splash-clock-pulse 2.2s ease-in-out infinite;
+}
+
+.ww-splash-slow-desc {
+  font-size: 0.75rem;
+  color: var(--ww-splash-text-muted);
+  line-height: 1.5;
+  max-width: 16rem;
+}
+
+.ww-splash-slow-sub {
+  font-size: 0.6875rem;
+  color: var(--ww-splash-text-subtle);
+  margin-top: 0.25rem;
+}
+
+/* 3. 加载失败状态 */
+.ww-splash-fail-badge {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 9999px;
+  background-color: var(--ww-splash-danger-bg);
+  color: var(--ww-splash-danger-text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.5rem;
+}
+
+.ww-splash-fail-title {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--ww-splash-text-main);
+  margin-bottom: 0.25rem;
+}
+
+.ww-splash-fail-desc {
+  font-size: 0.6875rem;
+  color: var(--ww-splash-text-muted);
+  line-height: 1.45;
+  max-width: 16rem;
+  margin-bottom: 0.85rem;
+}
+
+/* 重试按钮 (触控目标 >= 44x44px) */
+.ww-splash-retry-btn {
+  min-height: 2.75rem;
+  min-width: 9rem;
+  padding: 0.5rem 1.5rem;
+  border-radius: 9999px;
+  border: none;
+  background-color: var(--ww-splash-brand);
+  color: #FFFFFF;
+  font-size: 0.75rem;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  cursor: pointer;
+  box-shadow: 0 2px 8px -1px rgba(0, 0, 0, 0.1);
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+.ww-splash-retry-btn:active {
+  transform: scale(0.96);
+  opacity: 0.9;
+}
+
+.ww-splash-retry-btn:focus-visible {
+  outline: 2px solid var(--ww-splash-brand);
+  outline-offset: 2px;
+}
+
+/* 关键帧动画 */
+@keyframes ww-splash-breathe {
+  0%, 100% {
+    opacity: 0.25;
+    transform: scaleX(0.7);
+  }
+  50% {
+    opacity: 0.95;
+    transform: scaleX(1);
+  }
+}
+
+@keyframes ww-splash-clock-pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.08);
+    opacity: 1;
+  }
+}
+
+/* 尊重减少动画系统偏好 (prefers-reduced-motion) */
+@media (prefers-reduced-motion: reduce) {
+  .ww-splash-overlay {
+    transition: none !important;
+  }
+  .ww-splash-pulse-thumb,
+  .ww-splash-slow-badge {
+    animation: none !important;
+    opacity: 0.85 !important;
+    transform: none !important;
+  }
+  .ww-splash-retry-btn {
+    transition: none !important;
+    transform: none !important;
+  }
+}
+
+/* 适配超矮或横屏设备 */
+@media (max-height: 480px) and (orientation: landscape) {
+  .ww-splash-overlay {
+    padding: 0.5rem 1rem;
+  }
+  .ww-splash-logo {
+    width: 2.5rem;
+    height: 2.5rem;
+    font-size: 1.125rem;
+    margin-bottom: 0.5rem;
+  }
+  .ww-splash-title {
+    font-size: 1.25rem;
+  }
+  .ww-splash-status-box {
+    margin-top: 0.75rem;
+    min-height: 4rem;
+  }
+}

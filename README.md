@@ -123,3 +123,20 @@ export interface StoryService {
 - **已知工程依赖冲突**：Vite 与 esbuild 存在 peer 依赖版本差异，当前 `bun.lock` 为 Studio 临时状态，由 Sol 在接收后统一修复并生成正式可复现锁文件。
 - **Tailwind 全局 Preflight 影响**：Tailwind 对原生 button/input 的部分默认 reset 可能影响 ST 宿主样式，需在真实接入 ST 扩展时由 Sol 统一评估是否使用独立的 PostCSS prefixer 或 scoped preflight。
 - **真实大模型与 ST 原生插件挂载**：当前全部回复为内置 Mock 语料，未接入真实大模型；ST 原生 DOM 挂载由 Sol 负责。
+
+---
+
+## 七、启动加载画面与原生独立组件规范
+
+根据移动端优先与扩展加载生命周期要求，提供了两套互通实现的加载画面：
+
+### 1. React 内置组件 (`src/components/common/StartupLoadingScreen.tsx`)
+- 真实加载生命周期：监听服务初次就绪信号平滑退出，超时（4.5s）自动切换为“加载较久，继续等待”提示；遇到异常抛出清晰错误信息并提供受控重试按钮。
+- 原型评审工具支持：可在「演示工具」中随时唤起，模拟检验「正常加载」、「加载较久」、「加载失败」三态切换。
+- 零虚假进度、适配深浅色主题、适配 360/390/430px 及横屏，支持 `prefers-reduced-motion`。
+
+### 2. 独立原生包 (`standalone-splash/`)
+- 专供 SillyTavern 扩展在下载庞大 React Bundle 前瞬间直出展示。
+- 包含 `splash.css`、`splash.js`（挂载 `window.WeiwanSplash`）与 `index.html` 独立测试沙盒。
+- 详见 `standalone-splash/README.md`。
+
