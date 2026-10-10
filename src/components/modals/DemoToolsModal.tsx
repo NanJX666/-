@@ -8,6 +8,7 @@ interface DemoToolsModalProps {
   service: StoryService;
   onReloadRequested: () => void;
   onTriggerSplashPreview?: () => void;
+  onTriggerLoginPreview?: () => void;
 }
 
 export const DemoToolsModal: React.FC<DemoToolsModalProps> = ({
@@ -16,6 +17,7 @@ export const DemoToolsModal: React.FC<DemoToolsModalProps> = ({
   service,
   onReloadRequested,
   onTriggerSplashPreview,
+  onTriggerLoginPreview,
 }) => {
   const [simulateError, setSimulateError] = useState(service.getSimulateErrorOnce());
   const [emptyList, setEmptyList] = useState(service.getEmptyListSimulation());
@@ -116,6 +118,29 @@ export const DemoToolsModal: React.FC<DemoToolsModalProps> = ({
                 className="mt-1 touch-target-44 min-h-[44px] flex items-center justify-center gap-2 px-4 rounded-full bg-[var(--brand-primary-soft)] text-[var(--brand-primary)] hover:bg-[var(--brand-primary)] hover:text-white active:scale-95 text-xs font-medium transition-all cursor-pointer"
               >
                 <span>进入启动画面状态预览</span>
+              </button>
+            </div>
+          )}
+
+          {/* Test Option: Login Screen Preview */}
+          {onTriggerLoginPreview && (
+            <div className="p-3.5 rounded-2xl border border-[var(--border-light)] flex flex-col gap-2">
+              <div className="font-medium text-xs text-[var(--text-main)] flex items-center gap-1.5">
+                <Sparkles className="w-3.5 h-3.5 text-[var(--brand-primary)]" />
+                <span>手机端登录页面 (Login Screen) 预览</span>
+              </div>
+              <div className="text-[11px] text-[var(--text-muted)] leading-relaxed">
+                适配 360/390/430px 与键盘弹起；可测试“默认、输入中、登录中、密码错误、网络失败”5种状态，登录成功后衔接已有启动动画。
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  onClose();
+                  onTriggerLoginPreview();
+                }}
+                className="mt-1 touch-target-44 min-h-[44px] flex items-center justify-center gap-2 px-4 rounded-full bg-[var(--brand-primary-soft)] text-[var(--brand-primary)] hover:bg-[var(--brand-primary)] hover:text-white active:scale-95 text-xs font-medium transition-all cursor-pointer"
+              >
+                <span>进入手机登录页面预览</span>
               </button>
             </div>
           )}

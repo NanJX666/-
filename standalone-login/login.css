@@ -1,0 +1,423 @@
+/**
+ * login.css - “未完” 手机登录页面独立样式
+ * 专用前缀：.ww-login-
+ * 适用场景：SillyTavern Multi-user 扩展在主应用加载之前展示。
+ * 零框架依赖，严格隔离，不污染宿主样式。
+ */
+
+.ww-login-overlay {
+  --ww-login-font-novel: "Songti SC", "Source Han Serif SC", "Noto Serif CJK SC", "SimSun", "STSong", "Baskerville", Georgia, serif;
+  --ww-login-font-ui: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", system-ui, sans-serif;
+
+  /* 浅色主题 (珍珠白) */
+  --ww-login-bg-page: #F5F6F9;
+  --ww-login-bg-surface: #FFFFFF;
+  --ww-login-bg-subtle: #F0F2F6;
+  --ww-login-text-main: #202736;
+  --ww-login-text-muted: #6A7382;
+  --ww-login-text-subtle: #98A2B3;
+  --ww-login-brand: #625177;
+  --ww-login-brand-soft: #F0ECF4;
+  --ww-login-border: #E0E3EB;
+  --ww-login-danger-bg: #FEF2F2;
+  --ww-login-danger-text: #991B1B;
+  --ww-login-danger-border: #FECACA;
+  --ww-login-warning-bg: #FFFBEB;
+  --ww-login-warning-text: #92400E;
+  --ww-login-warning-border: #FDE68A;
+
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  z-index: 99990;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  padding-top: max(1rem, env(safe-area-inset-top, 0px));
+  padding-bottom: max(1rem, env(safe-area-inset-bottom, 0px));
+  box-sizing: border-box;
+  background-color: var(--ww-login-bg-page);
+  color: var(--ww-login-text-main);
+  font-family: var(--ww-login-font-ui);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  user-select: none;
+  -webkit-user-select: none;
+  opacity: 1;
+  transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.3s ease;
+}
+
+/* 深色主题 (墨夜沉寂) */
+.ww-login-overlay[data-theme="dark"] {
+  --ww-login-bg-page: #13161C;
+  --ww-login-bg-surface: #1B202A;
+  --ww-login-bg-subtle: #222834;
+  --ww-login-text-main: #DEE3ED;
+  --ww-login-text-muted: #8E99AA;
+  --ww-login-text-subtle: #5F6B7E;
+  --ww-login-brand: #9C86B8;
+  --ww-login-brand-soft: #2B2338;
+  --ww-login-border: #283040;
+  --ww-login-danger-bg: #381A22;
+  --ww-login-danger-text: #FCA5A5;
+  --ww-login-danger-border: #7F1D1D;
+  --ww-login-warning-bg: #332415;
+  --ww-login-warning-text: #FCD34D;
+  --ww-login-warning-border: #78350F;
+}
+
+/* 平滑退出类 */
+.ww-login-overlay.ww-login-exiting {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+/* 顶栏 */
+.ww-login-header {
+  width: 100%;
+  max-width: 24rem;
+  min-height: 2.75rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.ww-login-header-sub {
+  font-size: 0.6875rem;
+  letter-spacing: 0.05em;
+  color: var(--ww-login-text-subtle);
+}
+
+.ww-login-theme-btn {
+  width: 2.75rem;
+  height: 2.75rem;
+  min-width: 44px;
+  min-height: 44px;
+  border-radius: 9999px;
+  border: 1px solid var(--ww-login-border);
+  background-color: var(--ww-login-bg-subtle);
+  color: var(--ww-login-text-main);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.15s ease, background-color 0.15s ease;
+}
+
+.ww-login-theme-btn:active {
+  transform: scale(0.92);
+}
+
+/* 主体容器 (自适应 360, 390, 430px 及键盘弹出后的空间) */
+.ww-login-main {
+  width: 100%;
+  max-width: 22rem;
+  margin: auto 0;
+  padding: 0.75rem 0.5rem;
+  box-sizing: border-box;
+  text-align: center;
+}
+
+/* 品牌头部 */
+.ww-login-brand-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.ww-login-logo {
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 1.25rem;
+  background-color: var(--ww-login-brand);
+  color: #FFFFFF;
+  font-family: var(--ww-login-font-novel);
+  font-weight: 700;
+  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.12);
+  margin-bottom: 0.875rem;
+}
+
+.ww-login-title {
+  margin: 0;
+  font-family: var(--ww-login-font-novel);
+  font-size: 1.625rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  color: var(--ww-login-text-main);
+  line-height: 1.2;
+}
+
+.ww-login-tagline {
+  margin: 0.375rem 0 0 0;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  color: var(--ww-login-text-muted);
+  font-weight: 400;
+}
+
+/* 提示条 (错误 / 网络异常) */
+.ww-login-alert {
+  margin-bottom: 1rem;
+  padding: 0.625rem 0.875rem;
+  border-radius: 1rem;
+  font-size: 0.75rem;
+  line-height: 1.35;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-align: left;
+  border: 1px solid transparent;
+  animation: ww-login-fade-in 0.2s ease-out;
+}
+
+.ww-login-alert.ww-login-alert-auth {
+  background-color: var(--ww-login-danger-bg);
+  color: var(--ww-login-danger-text);
+  border-color: var(--ww-login-danger-border);
+}
+
+.ww-login-alert.ww-login-alert-network {
+  background-color: var(--ww-login-warning-bg);
+  color: var(--ww-login-warning-text);
+  border-color: var(--ww-login-warning-border);
+}
+
+.ww-login-alert-icon {
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+}
+
+/* 表单组 */
+.ww-login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  text-align: left;
+}
+
+.ww-login-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.ww-login-label {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--ww-login-text-muted);
+  padding-left: 0.25rem;
+}
+
+.ww-login-input-wrap {
+  position: relative;
+  width: 100%;
+}
+
+.ww-login-input {
+  width: 100%;
+  min-height: 3rem;
+  box-sizing: border-box;
+  padding: 0.75rem 1rem;
+  border-radius: 1rem;
+  border: 1px solid var(--ww-login-border);
+  background-color: var(--ww-login-bg-surface);
+  color: var(--ww-login-text-main);
+  /* 移动端强制 16px，防止 iOS Safari 唤起输入法时缩放页面 */
+  font-size: 16px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+}
+
+.ww-login-input::placeholder {
+  color: var(--ww-login-text-subtle);
+  font-size: 0.8125rem;
+}
+
+.ww-login-input:focus {
+  border-color: var(--ww-login-brand);
+  box-shadow: 0 0 0 3px rgba(98, 81, 119, 0.15);
+}
+
+.ww-login-input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* 密码输入框的切换显示按钮 */
+.ww-login-input-password {
+  padding-right: 3rem;
+}
+
+.ww-login-eye-btn {
+  position: absolute;
+  right: 0.25rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 2.75rem;
+  height: 2.75rem;
+  min-width: 44px;
+  min-height: 44px;
+  background: none;
+  border: none;
+  border-radius: 9999px;
+  color: var(--ww-login-text-muted);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  transition: color 0.15s ease, transform 0.15s ease;
+}
+
+.ww-login-eye-btn:active {
+  transform: translateY(-50%) scale(0.9);
+}
+
+.ww-login-eye-btn:focus-visible {
+  outline: 2px solid var(--ww-login-brand);
+}
+
+/* 提交主按钮 (>=44x44px 移动端规范) */
+.ww-login-submit-btn {
+  width: 100%;
+  min-height: 3.125rem;
+  border-radius: 9999px;
+  border: none;
+  background-color: var(--ww-login-brand);
+  color: #FFFFFF;
+  font-size: 0.875rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  box-shadow: 0 4px 12px -2px rgba(98, 81, 119, 0.25);
+  margin-top: 0.5rem;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.ww-login-submit-btn:active:not(:disabled) {
+  transform: scale(0.98);
+  opacity: 0.92;
+}
+
+.ww-login-submit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.ww-login-spinner {
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #FFFFFF;
+  border-radius: 50%;
+  animation: ww-login-spin 0.75s linear infinite;
+}
+
+/* 说明文字 */
+.ww-login-info {
+  margin: 1.25rem 0 0 0;
+  font-size: 0.6875rem;
+  line-height: 1.5;
+  color: var(--ww-login-text-subtle);
+  text-align: center;
+}
+
+/* 底栏 */
+.ww-login-footer {
+  width: 100%;
+  max-width: 24rem;
+  text-align: center;
+  font-size: 0.625rem;
+  letter-spacing: 0.04em;
+  color: var(--ww-login-text-subtle);
+  padding-top: 0.5rem;
+}
+
+/* 关键帧动效 */
+@keyframes ww-login-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes ww-login-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* 支持减弱动态效果偏好 */
+@media (prefers-reduced-motion: reduce) {
+  .ww-login-overlay {
+    transition: none !important;
+  }
+  .ww-login-alert {
+    animation: none !important;
+  }
+  .ww-login-spinner {
+    animation-duration: 1.5s !important;
+  }
+  .ww-login-submit-btn,
+  .ww-login-theme-btn,
+  .ww-login-eye-btn {
+    transition: none !important;
+    transform: none !important;
+  }
+}
+
+/* 适配矮屏与横屏设备 */
+@media (max-height: 520px) and (orientation: landscape) {
+  .ww-login-overlay {
+    padding: 0.5rem 1rem;
+  }
+  .ww-login-main {
+    padding: 0.25rem;
+  }
+  .ww-login-brand-box {
+    margin-bottom: 0.75rem;
+  }
+  .ww-login-logo {
+    width: 2.5rem;
+    height: 2.5rem;
+    font-size: 1.125rem;
+    margin-bottom: 0.25rem;
+  }
+  .ww-login-title {
+    font-size: 1.25rem;
+  }
+  .ww-login-form {
+    gap: 0.625rem;
+  }
+  .ww-login-input {
+    min-height: 2.5rem;
+    padding: 0.5rem 0.75rem;
+  }
+  .ww-login-submit-btn {
+    min-height: 2.5rem;
+  }
+}

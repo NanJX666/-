@@ -5,12 +5,14 @@ import { ReadingPreferences } from '../../types/story';
 
 interface LandingViewProps {
   onEnter: () => void;
+  onGoToLogin?: () => void;
   preferences: ReadingPreferences;
   onUpdatePreferences: (partial: Partial<ReadingPreferences>) => void;
 }
 
 export const LandingView: React.FC<LandingViewProps> = ({
   onEnter,
+  onGoToLogin,
   preferences,
   onUpdatePreferences,
 }) => {
@@ -93,7 +95,7 @@ export const LandingView: React.FC<LandingViewProps> = ({
         </div>
 
         {/* 进入演示主按钮 (44px+ 触控目标) */}
-        <div className="mt-6">
+        <div className="mt-6 flex flex-col items-center">
           <button
             type="button"
             onClick={onEnter}
@@ -102,6 +104,16 @@ export const LandingView: React.FC<LandingViewProps> = ({
             <span>进入演示</span>
             <ArrowRight className="w-4 h-4" />
           </button>
+
+          {onGoToLogin && (
+            <button
+              type="button"
+              onClick={onGoToLogin}
+              className="touch-target-44 mt-2.5 text-xs text-[var(--brand-primary)] hover:underline flex items-center justify-center gap-1 cursor-pointer font-medium"
+            >
+              <span>已有朋友/管理员账号？去登录</span>
+            </button>
+          )}
         </div>
 
         {/* 免责说明 */}

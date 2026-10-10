@@ -7,19 +7,22 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { ReadingPreferences, Story } from './types/story';
 import { mockStoryService } from './services/mockStoryService';
 import { LandingView } from './components/views/LandingView';
+import { LoginView } from './components/views/LoginView';
 import { StoryListView } from './components/views/StoryListView';
 import { CreateStoryView } from './components/views/CreateStoryView';
 import { ChatView } from './components/views/ChatView';
 import { DemoToolsModal } from './components/modals/DemoToolsModal';
 import { StartupLoadingScreen, StartupStatus } from './components/common/StartupLoadingScreen';
+import { APP_CONFIG } from './constants/config';
 import './styles/mobile-layout.css';
 
-type AppView = 'landing' | 'stories' | 'create' | 'chat';
+type AppView = 'landing' | 'login' | 'stories' | 'create' | 'chat';
 
 export default function App() {
   const [currentView, setCurrentView] = useState<AppView>('landing');
   const [activeStoryId, setActiveStoryId] = useState<string | null>(null);
   const [stories, setStories] = useState<Story[]>([]);
+  const [currentUser, setCurrentUser] = useState<string>(APP_CONFIG.visitorNickname);
   const [preferences, setPreferences] = useState<ReadingPreferences>(
     mockStoryService.getPreferences()
   );
@@ -105,12 +108,28 @@ export default function App() {
     setCurrentView('chat');
   };
 
+  // Login Success Handler: smoothly transitions into existing startup splash!
+  const handleLoginSuccess = (user: string) => {
+    setCurrentUser(user);
+    setIsStartupSplashVisible(true);
+    initApp();
+    setCurrentView('stories');
+  };
+
+  const handleLogout = () => {
+    setCurrentView('login');
+  };
+
   // Preview splash screen controls (from DemoTools)
   const handleTriggerSplashPreview = () => {
     setIsPreviewSplashMode(true);
     setStartupStatus('loading');
     setIsAppReady(false);
     setIsStartupSplashVisible(true);
+  };
+
+  const handleTriggerLoginPreview = () => {
+    setCurrentView('login');
   };
 
   const themeClass = preferences.theme === 'dark' ? 'theme-dark' : 'theme-light';
@@ -144,8 +163,18 @@ export default function App() {
       {currentView === 'landing' && (
         <LandingView
           onEnter={() => setCurrentView('stories')}
+          onGoToLogin={() => setCurrentView('login')}
           preferences={preferences}
           onUpdatePreferences={handleUpdatePreferences}
+        />
+      )}
+
+      {currentView === 'login' && (
+        <LoginView
+          preferences={preferences}
+          onUpdatePreferences={handleUpdatePreferences}
+          onLoginSuccess={handleLoginSuccess}
+          onCancel={() => setCurrentView('landing')}
         />
       )}
 
@@ -159,6 +188,8 @@ export default function App() {
           onCreateStory={() => setCurrentView('create')}
           onOpenDemoTools={() => setIsDemoToolsOpen(true)}
           onReload={refreshStories}
+          onLogout={handleLogout}
+          currentUser={currentUser}
         />
       )}
 
@@ -192,6 +223,7 @@ export default function App() {
         service={mockStoryService}
         onReloadRequested={refreshStories}
         onTriggerSplashPreview={handleTriggerSplashPreview}
+        onTriggerLoginPreview={handleTriggerLoginPreview}
       />
     </div>
   );

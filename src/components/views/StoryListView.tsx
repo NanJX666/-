@@ -36,6 +36,8 @@ interface StoryListViewProps {
   onCreateStory: () => void;
   onOpenDemoTools: () => void;
   onReload: () => void;
+  onLogout?: () => void;
+  currentUser?: string;
 }
 
 export const StoryListView: React.FC<StoryListViewProps> = ({
@@ -47,6 +49,8 @@ export const StoryListView: React.FC<StoryListViewProps> = ({
   onCreateStory,
   onOpenDemoTools,
   onReload,
+  onLogout,
+  currentUser,
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [menuOpenId, setMenuOpenId] = useState<string | null>(null);
@@ -200,9 +204,9 @@ export const StoryListView: React.FC<StoryListViewProps> = ({
                   >
                     <div className="px-3 py-2 border-b border-[var(--border-light)]">
                       <div className="font-medium text-[var(--text-main)] flex items-center justify-between">
-                        <span>{APP_CONFIG.visitorNickname}</span>
+                        <span>{currentUser || APP_CONFIG.visitorNickname}</span>
                         <span className="text-[10px] px-2 py-0.5 rounded-full bg-[var(--brand-primary-soft)] text-[var(--brand-primary)] font-medium">
-                          手机演示访客
+                          {currentUser ? '已登录' : '手机演示访客'}
                         </span>
                       </div>
                       <div className="text-[11px] text-[var(--text-muted)] mt-1">
@@ -210,7 +214,7 @@ export const StoryListView: React.FC<StoryListViewProps> = ({
                       </div>
                     </div>
 
-                    <div className="py-1">
+                    <div className="py-1 space-y-0.5">
                       <button
                         type="button"
                         role="menuitem"
@@ -223,6 +227,21 @@ export const StoryListView: React.FC<StoryListViewProps> = ({
                         <Sliders className="w-4 h-4 text-[var(--brand-primary)]" />
                         <span>原型测试工具 (网络错误/空列表)</span>
                       </button>
+
+                      {onLogout && (
+                        <button
+                          type="button"
+                          role="menuitem"
+                          onClick={() => {
+                            setAccountMenuOpen(false);
+                            onLogout();
+                          }}
+                          className="touch-target-44 w-full text-left px-3 py-2.5 rounded-2xl hover:bg-rose-50 dark:hover:bg-rose-950/30 text-rose-600 dark:text-rose-400 flex items-center gap-2 transition-colors cursor-pointer"
+                        >
+                          <RotateCcw className="w-4 h-4" />
+                          <span>退出登录 / 切换账号</span>
+                        </button>
+                      )}
                     </div>
                   </div>
                 </>

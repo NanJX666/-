@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>“未完” 手机登录页面 (独立预览与联调)</title>
+    <!-- 引入独立登录样式 -->
+    <link rel="stylesheet" href="./login.css" />
+    <!-- 引入已有的启动加载动画样式 (用于登录成功衔接) -->
+    <link rel="stylesheet" href="../standalone-splash/splash.css" />
+    <style>
+      /* 测试台控制器样式 (仅用于本预览页，接入 SillyTavern 时无需引入) */
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif;
+        background-color: #202736;
+        color: #F5F6F9;
+      }
+      .test-panel {
+        position: fixed;
+        bottom: 1rem;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 100000;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.4rem;
+        justify-content: center;
+        background: rgba(18, 22, 30, 0.92);
+        backdrop-filter: blur(8px);
+        padding: 0.5rem 0.75rem;
+        border-radius: 9999px;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+        max-width: 96vw;
+      }
+      .test-btn {
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: #FFFFFF;
+        font-size: 0.75rem;
+        padding: 0.35rem 0.65rem;
+        border-radius: 9999px;
+        cursor: pointer;
+        transition: background-color 0.15s ease;
+      }
+      .test-btn:active {
+        background: rgba(255, 255, 255, 0.25);
+      }
+      .under-content {
+        padding: 4rem 1.5rem;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- 模拟宿主页面内容：当登录成功且启动加载退出后，将呈现此内容 -->
+    <div class="under-content">
+      <h2 style="font-family: serif; font-size: 1.5rem; margin-bottom: 0.5rem;">SillyTavern 宿主页面已通过身份认证</h2>
+      <p style="font-size: 0.875rem; opacity: 0.7;">用户已就绪，启动动画已淡出，React / Lite 故事主应用正式挂载。</p>
+      <button class="test-btn" style="margin-top: 1rem;" onclick="relaunchLogin()">重新测试登录页面</button>
+    </div>
+
+    <!-- 浮动测试台控制器：用于检验各状态 -->
+    <div class="test-panel">
+      <button class="test-btn" onclick="testDefault()">1. 默认状态</button>
+      <button class="test-btn" onclick="testTyping()">2. 输入中</button>
+      <button class="test-btn" onclick="testSubmitting()">3. 登录中</button>
+      <button class="test-btn" onclick="testAuthError()">4. 密码错误</button>
+      <button class="test-btn" onclick="testNetworkError()">5. 网络失败</button>
+      <button class="test-btn" onclick="simulateLoginSuccess()">6. 登录成功 (衔接启动动画)</button>
+      <button class="test-btn" onclick="toggleTheme()">日/夜色切换</button>
+    </div>
+
+    <!-- 引入独立启动画面脚本 (衔接已有动画) -->
+    <script src="../standalone-splash/splash.js"></script>
+    <!-- 引入独立登录脚本 -->
+    <script src="./login.js"></script>
+    <script>
+      var currentTheme = 'light';
+
+      function mountLogin() {
+        WeiwanLogin.show({
+          theme: currentTheme,
+          onThemeChange: function (nextTheme) {
+            currentTheme = nextTheme;
+          },
+          onSubmit: function (credentials) {
+            console.log('[WeiwanLogin] 提交登录数据:', credentials);
+            WeiwanLogin.setLoading(true);
+
+            // 模拟与 SillyTavern /api/users/login 交互
+            setTimeout(function () {
+              if (credentials.username === 'wrong' || credentials.password === 'wrong') {
+                WeiwanLogin.setLoading(false);
+                WeiwanLogin.setError('账号或密码不正确，请重新输入', 'auth');
+                return;
+              }
+
+              if (credentials.username === 'offline') {
+                WeiwanLogin.setLoading(false);
+                WeiwanLogin.setError('连接故事服务器超时，请检查网络后重试', 'network');
+                return;
+              }
+
+              // 登录成功：销毁登录页面，平滑衔接已有的启动动画！
+              WeiwanLogin.destroy();
+              WeiwanSplash.show({
+                theme: currentTheme,
+                onRetry: function () {
+                  WeiwanSplash.setStatus('loading');
+                  setTimeout(function () {
+                    WeiwanSplash.ready();
+                  }, 1000);
+                }
+              });
+
+              // 模拟扩展核心 1.5 秒加载就绪，启动动画平滑退出
+              setTimeout(function () {
+                WeiwanSplash.ready();
+              }, 1500);
+            }, 600);
+          }
+        });
+      }
+
+      // 默认挂载展示
+      mountLogin();
+
+      function testDefault() {
+        if (!WeiwanLogin.overlayEl) mountLogin();
+        WeiwanLogin.clearError();
+        WeiwanLogin.setLoading(false);
+        if (WeiwanLogin.usernameInput) WeiwanLogin.usernameInput.value = '';
+        if (WeiwanLogin.passwordInput) WeiwanLogin.passwordInput.value = '';
+      }
+
+      function testTyping() {
+        if (!WeiwanLogin.overlayEl) mountLogin();
+        WeiwanLogin.clearError();
+        WeiwanLogin.setLoading(false);
+        if (WeiwanLogin.usernameInput) WeiwanLogin.usernameInput.value = 'linchu';
+        if (WeiwanLogin.passwordInput) WeiwanLogin.passwordInput.value = 'secret123';
+      }
+
+      function testSubmitting() {
+        testTyping();
+        WeiwanLogin.setLoading(true);
+      }
+
+      function testAuthError() {
+        testTyping();
+        WeiwanLogin.setLoading(false);
+        WeiwanLogin.setError('账号或密码不正确，请重新输入', 'auth');
+      }
+
+      function testNetworkError() {
+        testTyping();
+        WeiwanLogin.setLoading(false);
+        WeiwanLogin.setError('连接服务器超时，请检查网络后重试', 'network');
+      }
+
+      function simulateLoginSuccess() {
+        if (WeiwanLogin.overlayEl) {
+          WeiwanLogin.destroy();
+        }
+        WeiwanSplash.show({
+          theme: currentTheme,
+          onRetry: function () {
+            WeiwanSplash.setStatus('loading');
+            setTimeout(function () {
+              WeiwanSplash.ready();
+            }, 1000);
+          }
+        });
+        setTimeout(function () {
+          WeiwanSplash.ready();
+        }, 1500);
+      }
+
+      function toggleTheme() {
+        currentTheme = currentTheme === 'light' ? 'dark' : 'light';
+        WeiwanLogin.setTheme(currentTheme);
+        if (window.WeiwanSplash) {
+          WeiwanSplash.setTheme(currentTheme);
+        }
+      }
+
+      function relaunchLogin() {
+        if (window.WeiwanSplash) {
+          WeiwanSplash.destroy();
+        }
+        mountLogin();
+      }
+    </script>
+  </body>
+</html>

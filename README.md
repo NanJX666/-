@@ -140,3 +140,25 @@ export interface StoryService {
 - 包含 `splash.css`、`splash.js`（挂载 `window.WeiwanSplash`）与 `index.html` 独立测试沙盒。
 - 详见 `standalone-splash/README.md`。
 
+---
+
+## 八、手机登录页面与原生独立组件规范
+
+专为 SillyTavern Multi-user 体系设计的移动端登录组件，保证在 React 聊天应用载入前完成身份鉴权，并平滑衔接已有的启动动画：
+
+### 1. React 内置组件 (`src/components/views/LoginView.tsx`)
+- 包含品牌名「未完」与副标题「故事从这里继续」，采用统一衬线/非衬线字体栈与珍珠白/墨夜深色配色；
+- 适配 360/390/430px 屏幕与软键盘弹起后视口滚动，输入框采用 16px 字号防 iOS Safari 强制缩放；
+- 密码输入框支持眼睛图标切换显隐（`Eye`/`EyeOff`，触控区域 $\ge 44\times 44\text{px}$）；
+- 完整设置 `autocomplete="username"` 与 `autocomplete="current-password"`，支持主流浏览器密码自动填充；
+- 防重复提交控制：登录提交中进入禁用状态与旋转微动效；
+- 简洁明晰的错误与网络异常状态条，用户开始输入修改后自动清除错误；
+- 原型评审状态条：支持一键体验「默认」、「输入中」、「登录中」、「密码错误」、「网络失败」5种状态；
+- 登录成功后直接触发已有的 `StartupLoadingScreen`，平滑衔接进入主故事书架，避免冗余动画。
+
+### 2. 独立原生包 (`standalone-login/`)
+- 纯原生 Vanilla JS（约 5KB，挂载 `window.WeiwanLogin`）与专属样式前缀 `.ww-login-`；
+- 零第三方依赖，在 SillyTavern 扩展入口脚本中可直接引入并完成 `/api/users/login` 与 CSRF 交互；
+- 提供 `standalone-login/index.html` 独立测试沙盒与 `standalone-login/README.md` 接入文档。
+
+
